@@ -1,0 +1,42 @@
+#!/bin/sh
+
+xset +fp /usr/share/fonts/local
+xset fp rehash
+xrdb -merge $HOME/.Xresources
+xrdb -merge $HOME/.Xdefaults
+
+eval $(cat $HOME/.fehbg)
+
+# Start GNOME Keyring
+eval $(/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh)
+# You probably need to do this too:
+export GNOME_KEYRING_CONTROL GNOME_KEYRING_PID GPG_AGENT_INFO SSH_AUTH_SOCK
+
+sudo $HOME/.local/bin/fixtp &
+/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+/usr/bin/nm-applet &
+/usr/bin/xscreensaver -no-splash &
+/usr/bin/tlp xlogin
+$HOME/.local/bin/lightsOn.sh 550 &
+
+# /usr/bin/trayer --widthtype request --align right edge top --height 19 --transparent true --alpha 0 --tint 0x191919 --margin 0 &
+# /usr/bin/xcompmgr &
+
+BROWSER=chromium
+
+cnt=0
+
+while true; do
+	. $HOME/.local/bin/dwm-status
+
+	# execute every 5 minutes
+	if [[ $((cnt % 300)) -eq 0 ]]; then
+		# suspend if battery state < 5%
+		$HOME/.local/bin/suspend-on-low-bat
+	fi
+	
+	cnt=$(((cnt + 1) % 86400))
+	sleep 1s
+done &
+
+exec $HOME/.local/bin/startdwm

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+screenswitcher $@ && dwm-after-scsw

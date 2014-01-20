@@ -1,0 +1,11 @@
+#!/bin/bash
+
+sleep 1
+eval $(cat ~/.fehbg)
+
+pid=$(pgrep "trayer")
+
+if [[ $? -eq 0 ]]; then
+	kill $pid
+	(sleep 2 && trayer --widthtype request --align right --edge top --height 20 --transparent true --alpha 0 --tint 0x191919 --margin 0) &
+fi
