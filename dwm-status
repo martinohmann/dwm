@@ -102,7 +102,7 @@ print_battery() {
 	local battery_remaining
 	local battery_acpi=$(acpi -b)
 
-	if [ "$battery_acpi" = "" ]; then
+	if [[ -z "$battery_acpi" ]]; then
 		battery_prefix="${color_red}${glyph_bat_empty} "
 		battery="not present"
 	else

@@ -302,6 +302,7 @@ static void dwindle(Monitor *mon);
 static void spiral(Monitor *mon);
 static void bstack(Monitor *m);
 static void setgappx(const Arg *arg);
+static void runorraise(const Arg *arg);
 
 /* variables */
 static Systray *systray = NULL;
@@ -2998,6 +2999,27 @@ setgappx(const Arg *arg) {
 	i = arg->i + gappx;
 	gappx = i <= 0 ? 0 : i >= MAX_GAPPX ? MAX_GAPPX : i;
 	arrange(selmon);
+}
+
+void 
+runorraise(const Arg *arg) {                                                      
+	const char **app = arg->v;                                               
+	Arg a = { .ui = ~0 };                                                   
+	Monitor *mon;                                               
+	Client *c;                  
+	XClassHint hint = { NULL, NULL };                                           
+	for (mon = mons; mon; mon = mon->next) {                               
+		for (c = mon->clients; c; c = c->next) {                                
+			XGetClassHint(dpy, c->win, &hint);                                
+			if (hint.res_class && strcmp(app[2], hint.res_class) == 0) {                  
+				a.ui = c->tags;                  
+				view(&a);                    
+				focus(c);                               
+				return;                 
+			}                                  
+		}              
+	}                                    
+	spawn(arg);                                    
 }
 
 int
