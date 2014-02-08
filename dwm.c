@@ -773,7 +773,8 @@ createmon(void) {
 	m->nmaster = nmaster;
 	m->showbar = showbar;
 	m->topbar = topbar;
-	m->lt[0] = &layouts[0];
+	/* m->lt[0] = &layouts[0]; */
+	m->lt[0] = &layouts[taglts[1] % LENGTH(layouts)];
 	m->lt[1] = &layouts[1 % LENGTH(layouts)];
 	strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
 	if(!(m->pertag = (Pertag *)calloc(1, sizeof(Pertag))))
@@ -787,7 +788,8 @@ createmon(void) {
 		m->pertag->mfacts[i] = m->mfact;
 
 		/* init layouts */
-		m->pertag->ltidxs[i][0] = m->lt[0];
+		/* m->pertag->ltidxs[i][0] = m->lt[0] */
+		m->pertag->ltidxs[i][0] = &layouts[taglts[i]];
 		m->pertag->ltidxs[i][1] = m->lt[1];
 		m->pertag->sellts[i] = m->sellt;
 

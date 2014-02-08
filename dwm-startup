@@ -13,7 +13,7 @@ eval $(/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh
 export GNOME_KEYRING_CONTROL GNOME_KEYRING_PID GPG_AGENT_INFO SSH_AUTH_SOCK
 
 sudo $HOME/.local/bin/fixtp &
-/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+# /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 /usr/bin/nm-applet &
 /usr/bin/xscreensaver -no-splash &
 /usr/bin/tlp xlogin

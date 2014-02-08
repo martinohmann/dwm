@@ -121,27 +121,29 @@ print_battery() {
 		
 		battery_percentage=$(echo "${battery_acpi}" | \
 			awk '{ print $4 }' | tr -d '%,')
-		
-		battery_remaining=$(echo "${battery_acpi}" | \
-			awk '{ if ($5 != "until" && $5 != "discharging") { print $5 } }' | \
-			cut -d : -f 1-2)
-		
-		battery="${battery_percentage}%${battery_charge_glyph}"
-		
-		[[ -z "$battery_remaining" ]] || battery+=" ${battery_remaining}"
+			
+		if [[ ! -z "$battery_charge_glyph" ]] && [[ ! "$battery_percentage" -eq 100 ]]; then
+			battery_remaining=$(echo "${battery_acpi}" | \
+				awk '{ if ($5 != "until" && $5 != "discharging") { print $5 } }' | \
+				cut -d : -f 1-2)
+			
+			battery="${battery_percentage}%${battery_charge_glyph}"
+			
+			[[ -z "$battery_remaining" ]] || battery+=" ${battery_remaining}"
 
-		if [[ $battery_percentage -le 10 ]]; then
-			battery_prefix="${color_red}${glyph_bat_empty} "
-		elif [[ $battery_percentage -le 15 ]]; then
-			battery_prefix="${color_orange}${glyph_bat_low} "
-		elif [[ $battery_percentage -le 20 ]]; then
-			battery_prefix="${color_yellow}${glyph_bat_low} "
-		else
-			battery_prefix="${color_grey}${glyph_bat_high}${color_white}"
+			if [[ $battery_percentage -le 10 ]]; then
+				battery_prefix="${color_red}${glyph_bat_empty} "
+			elif [[ $battery_percentage -le 15 ]]; then
+				battery_prefix="${color_orange}${glyph_bat_low} "
+			elif [[ $battery_percentage -le 20 ]]; then
+				battery_prefix="${color_yellow}${glyph_bat_low} "
+			else
+				battery_prefix="${color_grey}${glyph_bat_high}${color_white}"
+			fi
 		fi
 	fi
 
-	echo -ne "${battery_prefix}${battery}"
+	echo -ne "${battery_prefix:-""}${battery:-""}"
 }
 
 print_song_info() {
@@ -202,23 +204,20 @@ print_weather() {
 		if [[ ! -z "$temp" ]]; then
 			case "$status_code" in
 				2??)
-					condition="thunderstorm"
-					;;
+					condition="thunderstorm";;
 				3??)
-					condition="drizzle"
-					;;
+					condition="drizzle";;
 				5??)
-					condition="rain"
-					;;
+					condition="rain";;
 				6??)
-					condition="snow"
-					;;
+					condition="snow";;
 				*)
 					condition=$(echo -e "$weather_xml" | grep 'weather' | \
 						sed -e 's/^.*value="\([^"]\+\)".*$/\1/' | tr '[:upper:]' '[:lower:]')
 			esac
 				
 			[[ "$temp" -eq -0 ]] && temp=0
+			[[ "$temp" -gt 200 ]] && temp=$((temp-273)) # hack to compensate strange api behaviour
 			weather="${color_grey}${glyph_weather}${color_white}${temp}°C"
 			[[ ! -z "$condition" ]] && weather+=", ${condition}"
 		fi
@@ -229,12 +228,6 @@ print_weather() {
 
 print_date() {
 	echo -ne "${color_white} $(date +"%a %b %d %Y, %H:%M")"
-}
-
-print_ip_addr() {
-	# can get confused if you use vmware
-	local ip=$(for i in `ip r`; do echo $i; done | grep -A 1 src | tail -n1) 
-	echo -ne "${color_white}${ip}"
 }
 
 print_wifi_link() {
@@ -253,7 +246,7 @@ print_wifi_link() {
 
 print_pacman_updates() {
 	local updates
-	local update_count=$(pacman -Qqu --dbpath /tmp/.localsync | wc -l)
+	local update_count=$(pacman -Qqu --dbpath /tmp/.localsync 2> /dev/null | wc -l)
 
 	if [[ $update_count -gt 0 ]]; then
 		updates="${color_grey}${glyph_pacman}${color_white}${update_count}"

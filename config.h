@@ -4,8 +4,8 @@
 
 /* appearance */
 /* static const char font[]            		= "-*-terminus-medium-r-*-*-12-*-*-*-*-*-*-*"; */
-static const char dmenufont[]           = "-*-ohsnap-medium-r-*-*-12-*-*-*-*-*-*-*";
-static const char font[]            		= "-*-ohsnap.icons-medium-r-*-*-12-*-*-*-*-*-*-*";
+static const char dmenufont[]           = "-*-ohsnap-medium-r-*-*-14-*-*-*-*-*-*-*";
+static const char font[]            		= "-*-ohsnap.icons-medium-r-*-*-14-*-*-*-*-*-*-*";
 static const char normbordercolor[] 		= "#191919"; //"#444444";
 static const char normbgcolor[]     		= "#191919"; //"#222222";
 static const char normfgcolor[]     		= "#c2c2b0"; //"#bbbbbb";
@@ -46,10 +46,9 @@ static const Bool focusonwheelscroll = False;
 /* tagging */
 #define MAX_TAGLEN 16
 static char tags[][MAX_TAGLEN] = { "main", "web", "work", "misc", "media", "chat" };
-
 static const Rule rules[] = {
 	/* class      					instance    title       								tags mask     isfloating   monitor */
-  /* { NULL,       				NULL,       NULL,       								0,            False,      -1 } */
+  /* { NULL,       				NULL,       NULL,  }    								0,            False,      -1 } */
 	{ "Skype",    	 				NULL, 			"martin.ohmann - Skype™", 	1 << 5,       True,       -1 },
 	{ "Skype",    	 				NULL, 			NULL, 											1 << 5, 			True,       -1 },
 	{ "Pidgin",   	 				NULL,       NULL, 			      					1 << 5,       True,       -1 },
@@ -59,6 +58,7 @@ static const Rule rules[] = {
 	{ "Thunar",        			NULL,       "Confirm to replace files", 0,        		True,    		-1 },
 	{ "Yad",        				NULL,       "System Logout",  					~0,        		True,    		-1 },
 	{ "Pavucontrol", 				NULL, 			"Volume Control", 					0, 						True, 			-1 },
+	{ "Gcr-prompter", 			NULL, 			"Unlock private key", 			0, 						True, 			-1 },
 	{ "trayer",        			NULL,       NULL,    										~0,        		True,    		-1 },
 	{ "stalonetray",    		NULL,       NULL,    										~0,        		True,    		-1 },
 	{ "Java", 							NULL, 			"Eclipse", 									0, 						True, 			-1 },
@@ -82,6 +82,8 @@ static const Layout layouts[] = {
 	{ "[@]", 			spiral },
 	{ "[\\\\]", 	dwindle }
 };
+/* default tag layouts upon dwm start (tag 0 is invisible) */
+static const unsigned int taglts[] = { 0, 0, 2, 0, 0, 1, 1 };
 
 /* key definitions */
 #define ALTKEY Mod1Mask
@@ -108,8 +110,8 @@ static const char *volupcmd[] = { "volup", NULL };
 static const char *voldowncmd[] = { "voldown", NULL };
 static const char *voltogglecmd[] = { "voltoggle", NULL };
 static const char *screensinglecmd[] = { "dwm-scsw", "-s", NULL };
-static const char *screenextendcmd[] = { "dwm-scsw", "-s", NULL };
-static const char *screenclonecmd[] = { "dwm-scsw", "-s", NULL };
+static const char *screenextendcmd[] = { "dwm-scsw", "-e", NULL };
+static const char *screenclonecmd[] = { "dwm-scsw", "-c", NULL };
 static const char *lockscreencmd[] = { "xscreensaver-command", "-lock", NULL };
 static const char *killdwmcmd[] = { "killall", "startdwm", NULL };
 static const char *toggletray[] = { "toggletray", NULL };
