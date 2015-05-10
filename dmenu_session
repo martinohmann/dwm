@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# session script using dmenu
+#
+# author: Martin Ohmann <martin@mohmann.de>
+#
+
+main() {
+	local action
+	local cmd
+
+	action="$(echo -e "1: suspend\n2: poweroff\n3: reboot\n4: restart dwm\n5: logout\n6: lock screen" | \
+		dmenu_wrapper -b -p "Session:")"
+
+	case "$action" in
+		*suspend)  	cmd="/usr/sbin/systemctl suspend -i";;
+		*poweroff) 	cmd="/usr/sbin/systemctl poweroff -i";;
+		*reboot) 		cmd="/usr/sbin/systemctl reboot -i";;
+		*dwm) 			cmd="killall dwm";;
+		*logout) 		cmd="killall dwm-startup";;
+		*screen) 		cmd="/usr/bin/xscreensaver-command -lock";;
+		*) 					exit 1;;
+	esac
+
+	eval exec "$cmd"
+}
+
+main

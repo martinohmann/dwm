@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# dmenu wrapper
+#
+# adds some default options if not specified
+#
+# author: Martin Ohmann <martin@mohmann.de>
+#
+
+main() {
+	[[ "$@" != *-fn ]] && font="-*-ohsnap-medium-r-*-*-14-*-*-*-*-*-*-*"
+	[[ "$@" != *-nb ]] && args="${args} -nb #181a1b"
+	[[ "$@" != *-nf ]] && args="${args} -nf #a3a4a8"
+	[[ "$@" != *-sb ]] && args="${args} -sb #181a1b"
+	[[ "$@" != *-sf ]] && args="${args} -sf #6f81a3"
+	# [[ "$@" != *-b ]] && args="${args} -b"
+
+	if [[ -n "$font" ]]; then
+		/usr/bin/dmenu -fn "$font" $args "$@"
+	else 
+		/usr/bin/dmenu $args "$@"
+	fi
+}
+
+main "$@"

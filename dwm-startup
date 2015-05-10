@@ -1,42 +1,82 @@
 #!/bin/sh
+#
+# custom dwm startup script
+#
+# author: Martin Ohmann <martin@mohmann.de>
+#
 
+# set font path
 xset +fp /usr/share/fonts/local
+
+# update font config
 xset fp rehash
+
+# load .Xresources and .Xdefaults
 xrdb -merge $HOME/.Xresources
 xrdb -merge $HOME/.Xdefaults
 
-eval $(cat $HOME/.fehbg)
-
-# Start GNOME Keyring
+# init keyring
 eval $(/usr/bin/gnome-keyring-daemon --start --components=gpg,pkcs11,secrets,ssh)
-# You probably need to do this too:
+
+# export keyring globals
 export GNOME_KEYRING_CONTROL GNOME_KEYRING_PID GPG_AGENT_INFO SSH_AUTH_SOCK
 
+# override style for QT applications
+export QT_STYLE_OVERRIDE=gtk
+
+# fix trackpoint issues
 sudo $HOME/.local/bin/fixtp &
-# /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
+# lanuch polkit auth agent
+#/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
+
+# set wallpaper
+eval $(cat $HOME/.fehbg)
+# lauch system tray
+$HOME/.local/bin/trayer &
+
+# lauch network manager applet
 /usr/bin/nm-applet &
+
+# launch xscreensaver daemon
 /usr/bin/xscreensaver -no-splash &
-/usr/bin/tlp xlogin
-$HOME/.local/bin/lightsOn.sh 550 &
 
-# /usr/bin/trayer --widthtype request --align right edge top --height 19 --transparent true --alpha 0 --tint 0x191919 --margin 0 &
-# /usr/bin/xcompmgr &
+# disable screensaver for fullscreen video
+$HOME/.local/bin/lightsOn.sh 1190 &
 
-BROWSER=chromium
+# lauch music player daemon
+#/usr/bin/mpd > /dev/null 2>&1 &
 
-cnt=0
+# launch owncloud
+# /usr/bin/owncloud > /dev/null 2>&1 &
 
-while true; do
-	. $HOME/.local/bin/dwm-status
+# launch dropbox
+dropboxd > /dev/null 2>&1 &
 
-	# execute every 5 minutes
-	if [[ $((cnt % 300)) -eq 0 ]]; then
-		# suspend if battery state < 5%
-		$HOME/.local/bin/suspend-on-low-bat
+# launch thunderbird
+/usr/bin/thunderbird > /dev/null 2>&1 &
+
+# set dircolors
+eval $(dircolors -b $HOME/.dircolors)
+
+# lauch compositor
+/usr/bin/compton -CGb -f -D 5 --fade-exclude 'class_g = "trayer"' --backend glx
+
+# lauch notification daemon
+/usr/bin/dunst > /dev/null 2>&1 &
+
+$HOME/.local/bin/dwm-status.rb > ~/.dwm-status.log 2>&1 &
+
+# hacky: switch to external screen, if any. need to improve this sometime
+(
+	sleep 1
+	if xrandr | grep "DP1 connected" > /dev/null 2>&1; then
+		screenswitcher -s
+		screenswitcher -s
+		dwm-after-scsw
 	fi
-	
-	cnt=$(((cnt + 1) % 86400))
-	sleep 1s
-done &
+) &
 
-exec $HOME/.local/bin/startdwm
+while true; do 
+  dwm 2> ~/.dwm.log
+done
